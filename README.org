@@ -1,12 +1,12 @@
 * Fall 2021 235 Recursion Project
 
-* Last name:
+* Last name:Cheung
 
-* First name:
+* First name:Cheung
 
-* GitHub username:
+* GitHub username:ccheung62
 
-* Notes:
+* Notes: Completing the n-queens
 
 - Due: Monday 2/22 8:00am
 

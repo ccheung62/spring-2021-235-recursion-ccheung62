@@ -8,7 +8,7 @@ void createBoard(std::string** board, int n){
             board[i][j] = ".";
         }
     }
-    board[n] = new std::string[4];
+    board[n] = new std::string[n*2];
 }
 
 void printBoard(std::string** board, int n){
@@ -24,10 +24,10 @@ void printBoard(std::string** board, int n){
     usleep(600000);
 }
 
-void mark(std::string** board, int n, int row, int col, int &count){
+void mark(std::string** board, int n, int row, int col, int &count, int queen){
     if (row < 0 || row >= n || col < 0 || col >= n){
-        row = std::stoi(board[n][0]);
-        col = std::stoi(board[n][1]);
+        row = std::stoi(board[n][queen*2]);
+        col = std::stoi(board[n][(queen*2)+1]);
         count++;
         // std::cout << "count: " << count << std::endl;
         // return;
@@ -74,28 +74,28 @@ void mark(std::string** board, int n, int row, int col, int &count){
     // std::cout << "count: " << count << std::endl;
     switch(count){
         case 0: 
-            mark(board, n, row+1, col+1, count);
+            mark(board, n, row+1, col+1, count, queen);
             break;
         case 1:
-            mark(board, n, row+1, col-1, count);
+            mark(board, n, row+1, col-1, count, queen);
             break;
         case 2:
-            mark(board, n, row-1, col-1, count);
+            mark(board, n, row-1, col-1, count, queen);
             break;
         case 3:
-            mark(board, n, row-1, col+1, count);
+            mark(board, n, row-1, col+1, count, queen);
             break;
         case 4:
-            mark(board, n, row, col+1, count);
+            mark(board, n, row, col+1, count, queen);
             break;
         case 5: 
-            mark(board, n, row, col-1, count);
+            mark(board, n, row, col-1, count, queen);
             break;
         case 6:
-            mark(board, n, row+1, col, count);
+            mark(board, n, row+1, col, count, queen);
             break;
         case 7:
-            mark(board, n, row-1, col, count);
+            mark(board, n, row-1, col, count, queen);
             break;
         default:
             return;
@@ -123,63 +123,148 @@ void mark(std::string** board, int n, int row, int col, int &count){
     // mark(board, n, row, col-1);
 }
 
-void checkBoard(std::string** board, int n, int row, int col, bool &full){
-    for (int i=0; i<n; i++){
-        for (int j=0; j<n; j++){
-            if (board[i][j] == "."){
-                full = false;
-                // std::cout << "inside the checkBoard I made the full bool false" << std::endl;
-                return;
-            }
+// void checkBoard(std::string** board, int n, int row, int col, bool &full){
+//     for (int i=0; i<n; i++){
+//         for (int j=0; j<n; j++){
+//             if (board[i][j] == "."){
+//                 full = false;
+//                 // std::cout << "inside the checkBoard I made the full bool false" << std::endl;
+//                 return;
+//             }
+//         }
+//     }
+// } 
+
+bool checkQ(std::string** board, int n, int row, int col, int &queen){
+    for (int a=0; a<n; a++){
+        for(int b=0; b<n; b++){
+            board[a][b] = ".";
         }
     }
-} 
+    for (int q=0; q<queen; q++){
+        int r = std::stoi(board[n][q*2]);
+        int c = std::stoi(board[n][(q*2)+1]);
+        // std::cout << "marking row: " << r << " col: " << c << std::endl;
+        int count = 0;
+        mark(board, n, r, c, count, q);
+        board[r][c] = "Q";
+        // std::cout << "rewriting row:" << row << "  col:" << col << std::endl;
+    }
+    if (board[row][col] != "X"){
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 
 void solve(std::string** board, int n, int row, int col, int &queen, bool &full){
-    printBoard(board,n);
-    if (row < 0 || row >= n || col < 0 || col >= n){
+    if (col >= n || queen >=n){
         return;
     }
-    else if (board[row][col] == "X"){
-        board[row][col] = "~";
-    }
-    if (queen < n && board[row-1][col] != "Q" && board[row-1][col] != "~" && board[row][col] != "+"){
-        solve(board, n, row-1, col, queen, full);
-    }
-    // std::cout << "row: " << row << "   col: " << col << std::endl;
-    if (queen < n && board[row][col+1] != "Q" && board[row][col+1] != "~" && board[row][col] != "+"){
-        solve(board, n, row, col-1, queen, full);
-    }
-    // std::cout << "row: " << row << "   col: " << col << std::endl;
-    if (queen < n && board[row+1][col] != "Q" && board[row+1][col] != "~" && board[row][col] != "+"){
-        solve(board, n, row+1, col, queen, full);
-    }
-    // std::cout << "row: " << row << "   col: " << col << std::endl;
-    if (queen < n && board[row][col+1] != "Q" && board[row][col+1] != "~" && board[row][col] != "+"){
-        solve(board, n, row, col+1, queen, full);
-    }
-    // std::cout << "Is it a dot " << (board[row][col] == ".") << std::endl;
-    if (board[row][col] == "."){
-        // std::cout << "queen: " << queen << std::endl;
-        board[n][0] = std::to_string(row);
-        board[n][1] = std::to_string(col);
-        int count = 0;
-        mark(board, n, row, col, count);
-        board[row][col] = "Q";
-        queen++;
-        full = true;
-        checkBoard(board, n, row, col, full);
-        if (full && queen < n){
-            std::cout << "wrong answer" << std::endl;
-            return;
-        }
         for(int i=0; i<n; i++){
-            for(int j=0; j<n; j++){
-                if(board[i][j] == "~"){
-                    board[i][j] = "X";
+            // for (int a=0; a<n; a++){
+            //     for(int b=0; b<n; b++){
+            //         board[a][b] = ".";
+            //     }
+            // }
+            // for (int q=0; q<queen; q++){
+            //     int r = std::stoi(board[n][q]);
+            //     int c = std::stoi(board[n][q+1]);
+            //     std::cout << "marking row: " << r << " col: " << c << std::endl;
+            //     mark(board, n, r, c, count, q);
+            //     board[r][c] = "Q";
+            //     std::cout << "rewriting row:" << row << "  col:" << col << std::endl;
+            // }
+            // std::cout << "row: " << row << "  col: " << col << std::endl;
+
+            if (checkQ(board, n, i, col, queen)){
+                board[n][queen*2] = std::to_string(i);
+                board[n][(queen*2)+1] = std::to_string(col);
+                // mark(board, n, i, col, count, queen);
+                // board[i][col] = "Q";
+                queen++;
+                solve(board, n, i, col+1, queen, full);
+                if (queen >= n){
+                    return;
                 }
+                std::cout << "time to backtrack" << std::endl;
+                queen--;
+                std::cout << "queen: " << queen << std::endl;
+                // for (int a=0; a<n; a++){
+                //     for (int b=0; b<n; b++){
+                //         board[a][b] = ".";
+                //     }
+                // }
+                // for (int q=0; q<queen; q++){
+                //     int r = std::stoi(board[n][q]);
+                //     int c = std::stoi(board[n][q+1]);
+                //     board[r][c] = ".";
+                //     mark(board, n, r, c, count, q);
+                //     board[r][c] = "Q";
+                //     std::cout << "rewriting row:" << row << "  col:" << col << std::endl;
+                // }
             }
+            // for (int q=0; q<queen; q++){
+            //     int r = std::stoi(board[n][q]);
+            //     int c = std::stoi(board[n][q+1]);
+            //     board[r][c] = ".";
+            //     mark(board, n, r, c, count, q);
+            //     board[r][c] = "Q";
+            //     std::cout << "rewriting row:" << row << "  col:" << col << std::endl;
+            // }
         }
+
+
+
+
+
+
+
+    // printBoard(board,n);
+    // if (row < 0 || row >= n || col < 0 || col >= n){
+    //     return;
+    // }
+    // else if (board[row][col] == "X"){
+    //     board[row][col] = "~";
+    // }
+    // if (queen < n && board[row-1][col] != "Q" && board[row-1][col] != "~" && board[row][col] != "+"){
+    //     solve(board, n, row-1, col, queen, full);
+    // }
+    // // std::cout << "row: " << row << "   col: " << col << std::endl;
+    // if (queen < n && board[row][col+1] != "Q" && board[row][col+1] != "~" && board[row][col] != "+"){
+    //     solve(board, n, row, col-1, queen, full);
+    // }
+    // // std::cout << "row: " << row << "   col: " << col << std::endl;
+    // if (queen < n && board[row+1][col] != "Q" && board[row+1][col] != "~" && board[row][col] != "+"){
+    //     solve(board, n, row+1, col, queen, full);
+    // }
+    // // std::cout << "row: " << row << "   col: " << col << std::endl;
+    // if (queen < n && board[row][col+1] != "Q" && board[row][col+1] != "~" && board[row][col] != "+"){
+    //     solve(board, n, row, col+1, queen, full);
+    // }
+    // // std::cout << "Is it a dot " << (board[row][col] == ".") << std::endl;
+    // if (board[row][col] == "."){
+    //     // std::cout << "queen: " << queen << std::endl;
+    //     board[n][0] = std::to_string(row);
+    //     board[n][1] = std::to_string(col);
+    //     int count = 0;
+    //     mark(board, n, row, col, count);
+    //     board[row][col] = "Q";
+    //     queen++;
+    //     full = true;
+    //     checkBoard(board, n, row, col, full);
+    //     if (full && queen < n){
+    //         std::cout << "wrong answer" << std::endl;
+    //         return;
+    //     }
+    //     for(int i=0; i<n; i++){
+    //         for(int j=0; j<n; j++){
+    //             if(board[i][j] == "~"){
+    //                 board[i][j] = "X";
+    //             }
+    //         }
+    //     }
         //     return;
         // }
         // else{
@@ -213,7 +298,7 @@ void solve(std::string** board, int n, int row, int col, int &queen, bool &full)
         //     mark(board, n, row, col, count);
         //     std::cout << "reseting the board with the starting point row: " << row << "  col: " << col << std::endl;
         // }
-    }
+    // }
     // else if (board[row][col] == "Q"){
     //     if (row+1 >= n){
     //         row 
@@ -221,7 +306,7 @@ void solve(std::string** board, int n, int row, int col, int &queen, bool &full)
     // }
     // std::cout << "queen: " << queen << std::endl;
     // full = false;
-    std::cout << "row: " << row << "   col: " << col << std::endl;
+    // std::cout << "row: " << row << "   col: " << col << std::endl;
     // if (full){
     //     return;
     // }
@@ -260,22 +345,37 @@ void deleteBoard(std::string** board, int n){
 }
 
 int main (){
+    int n = 4;
     std::string** board;
-    createBoard(board, 6);
+    createBoard(board, n);
     // int count = 0;
     // board[6][0] = "1";
     // board[6][1] = "2";
     // mark(board, 6, 1, 2, count);
     // board[1][2] = "Q";
-    int n = 4;
     int row = 0;
     int col = 0;
-    board[n][2] = std::to_string(row);
-    board[n][3] = std::to_string(col);
-    std::cout << "row: " << board[n][2] << "  col: " << board[n][3] << std::endl;
+    // board[n][2] = std::to_string(row);
+    // board[n][3] = std::to_string(col);
+    // std::cout << "row: " << board[n][2] << "  col: " << board[n][3] << std::endl;
     int queen = 0;
     bool full = true;
-    solve(board, n, 1, 2, queen, full);
+    solve(board, n, 0, 0, queen, full);
+    // for (int i=0; i<n*2; i++){
+    //     std::cout << "board[n][" << i << "] = " << board[n][i] << std::endl;
+    // }
+    // printBoard(board, n);
+    std::cout << "The solution for n-queens with " << n << " x " << n << " grid is: " << std::endl;
+    for (int i=0; i<n; i++){
+        for (int j=0; j<n; j++){
+            if(board[i][j] == "X"){
+                board[i][j] = ".";
+            }
+            else{
+                board[i][j] = "Q";
+            }
+        }
+    }
     printBoard(board, n);
     deleteBoard(board,n);
     return 0;

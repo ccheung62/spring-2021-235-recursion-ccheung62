@@ -6,7 +6,7 @@
 
 * GitHub username:ccheung62
 
-* Notes: Completing the n-queens
+* Notes: Completed the n-queens
 
 - Due: Monday 2/22 8:00am
 

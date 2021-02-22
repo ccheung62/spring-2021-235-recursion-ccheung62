@@ -7,10 +7,11 @@
 
 int main (){
     // set the grid to be 4x4
-    int n = 8;
+    int n = 4;
     std::string** board;
     createBoard(board, n);
     int queen = 0;
+    system("clear");
     solve(board, n, 0, queen);
     //change everything thing other than a Q to . for aesthetics
     for (int i=0; i<n; i++){

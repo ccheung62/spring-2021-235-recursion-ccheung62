@@ -1,6 +1,5 @@
 main: main.o n-queens.o
 	g++ -o main main.o n-queens.o
-	clear
 
 main.o: main.cpp n-queens.h
 
